@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<launch>
+
+  <!-- Starting our world scenario -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">	    
+	<arg name="world_name" value="$(find myrobot_gazebo)/worlds/myworld_prova.world"/>	    
+	<arg name="gui" value="true"/>	  
+	<arg name="paused" value="true"/>
+  </include>	
+
+
+
+ <!-- defining the position of the robot -->
+  <arg name="x1" default="0"/>
+  <arg name="y1" default="0"/>
+
+
+   <!-- Load the URDF into the ROS Parameter Server -->
+  <param name="robot_description" 
+	 command="$(find xacro)/xacro --inorder $(find myrobot_gazebo)/urdf/myrobot_descr.xacro" />
+
+
+  <!-- launching the spawner and the controller for myrobot -->
+  
+    <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+          args="-urdf -model myrobot -param robot_description -x $(arg x1) -y $(arg y1) -z 0.05"/>
+     <!-- <node name="my_tf_broadcaster" pkg="myrobot_control" type="turtle_tf_broadcaster" /> --> 
+   <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
+   <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />     
+
+
+  <!-- Launching Rviz -->  
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find myrobot_gazebo)/rviz_parameters/urdf_mine.rviz" />
+
+
+
+
+
+
+<?ignore
+  <!-- Load the URDF into the ROS Parameter Server -->
+  <arg name="robot_description"
+     default="$(find myrobot_gazebo)/urdf/myrobot_descr.xacro"/>
+    
+  <param name="/robot_description"
+   command="$(find xacro)/xacro --inorder $(arg robot_description) namesapce_deploy:=$(arg ns1)"/>
+
+?>
+
+
+<?ignore
+  <!-- launching the spawner and the controller for robot -->
+  <group ns="$(arg ns1)">
+  <param name="tf_prefix" value="myrobot_tf" />
+  	<node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+      args="-urdf -model $(arg ns1) -param /robot_description -x $(arg x1) -y $(arg y1) -z 0.05"/>
+      <!-- <node name="controller" pkg="myrobot_control" type="testnode" />   -->
+  </group>
+?>
+
+
+</launch>
