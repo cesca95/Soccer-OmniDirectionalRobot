@@ -82,7 +82,9 @@ class image_feature:
 			cv2.circle(image_np, (int(x), int(y)), int(radius),
 				(0, 255, 255), 2)
 			cv2.circle(image_np, center, 5, (0, 0, 255), -1)
-			dist = 2*(3.04*(10*100))/(radius)
+			# width(640)/(2*tan(62.2/2))
+			foallength_pixels = 530.469971363
+			dist = (foallength_pixels*(10*100))/(radius)
 			print dist
  
 	# update the points queue

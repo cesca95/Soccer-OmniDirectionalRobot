@@ -29,15 +29,19 @@
   </gazebo>
 
 
+<!-- Raspberry camer params 
+
+FOV 62.2 deg -> 1.08559479474
+--> 
  <!-- CAMERA -->
   <gazebo reference="camera_link">
     <sensor type="camera" name="camera1">
       <update_rate>30.0</update_rate>
       <camera name="head">
-        <horizontal_fov>1.0855947947</horizontal_fov>
+        <horizontal_fov>1.08559479474</horizontal_fov>
         <image>
-          <width>367.767060567</width>
-          <height>367.767060567</height>
+          <width>640</width>
+          <height>480</height>
           <format>R8G8B8</format>
         </image>
         <clip>
@@ -62,7 +66,7 @@
         <cameraInfoTopicName>camera_info</cameraInfoTopicName>
         <frameName>camera_link</frameName>
         <hackBaseline>0.07</hackBaseline>
-        <focalLength>304.000</focalLength>
+        <!--focalLength>304.000</focalLength>-->
         <distortionK1>0.0</distortionK1>
         <distortionK2>0.0</distortionK2>
         <distortionK3>0.0</distortionK3>
