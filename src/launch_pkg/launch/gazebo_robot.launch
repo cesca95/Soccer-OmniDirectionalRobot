@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
 <launch>
 
+
   <!-- Starting our world scenario -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">	    
-	<arg name="world_name" value="$(find myrobot_gazebo)/worlds/myworld.world"/>	    
+	<arg name="world_name" value="$(find myrobot_gazebo)/worlds/ball_left.world"/>	    
 	<arg name="gui" value="true"/>	  
-	<arg name="paused" value="true"/>
+	<arg name="paused" value="false"/>
   </include>	
-
 
 
  <!-- defining the position of the robot -->
@@ -27,10 +27,6 @@
      <!-- <node name="my_tf_broadcaster" pkg="myrobot_control" type="turtle_tf_broadcaster" /> --> 
    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
    <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />     
-
-
-  <!-- Launching Rviz -->  
-  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find myrobot_gazebo)/rviz_parameters/urdf_mine.rviz" />
 
 
 </launch>

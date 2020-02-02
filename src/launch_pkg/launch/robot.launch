@@ -1,5 +1,0 @@
-<?xml version="1.0"?>
-<launch>
-	<include file="$(find myrobot_gazebo)/launch/myrobot_world.launch"/>
-	<!--<node name="example_ball" pkg="bridge_example" type="example_ball.py" output="screen"/> -->
-</launch>

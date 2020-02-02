@@ -4,13 +4,29 @@
 
 #include <robot_control/RobotVision.h>
 #include <geometry_msgs/Twist.h>
+#include <robot_control/BallPose.h>
 
-int missionPhase = 0; // mission phase 
+#include <iostream> 
+#include <utility> 
+#include <cmath>
+
+// Author: Astha Gupta
+
+int missionPhase = 1; // mission phase 
 
 int ballAngle;
 int goalAngle;
 
-ros::Publisher chatter_pub;
+ros::Publisher cmdVel_pub;
+
+// camera parameters
+std::pair <int, int> imageInfo((640/2),(480/2));
+// imageInfo.first = 480;
+// imageInfo.second = 640; 
+
+float center_threshold = 0.05;
+
+ros::ServiceClient client;
 
 // 1) tracking where the goal and ball is (keep rotating to know )
 // 2) get the ball at the center 
@@ -18,29 +34,41 @@ ros::Publisher chatter_pub;
 // 3) pushing the ball 
 
 // ocallback for RobotVision.msgs 
-float saturateVelocity(float vel){
+float saturateVelocity(float vel, bool lin_ang){
   ROS_DEBUG_STREAM("start");
   ROS_DEBUG_STREAM(vel);
 
-  if(vel > 0.1){
-    vel = 0.1;
+  int sign = 1;
+  if(vel < 0) sign = -1;
+  
+  vel = std::abs(vel);
+
+  if(lin_ang == true){
+  	// linear velocity saturation 
+  	  if(vel > 0.1){
+	    vel = 0.1;
+	  }
+	  if(vel < 0.02) vel = 0.02;
+	  ROS_DEBUG_STREAM("end");
+	  ROS_DEBUG_STREAM(vel);
+	  return sign*vel;
   }
-  if(vel < 0.02) vel = 0.02;
-  ROS_DEBUG_STREAM("end");
-  ROS_DEBUG_STREAM(vel);
-  return vel;
+  else{
+    // angular velocity saturation 
+  	if(vel > 0.1){
+	    vel = 0.1;
+	  }
+	  if(vel < 0.02) vel = 0.02;
+	  ROS_DEBUG_STREAM("end");
+	  ROS_DEBUG_STREAM(vel);
+	  return sign*vel;
+  }
+
 }
 
 void call_back_vision(const robot_control::RobotVision::ConstPtr& msg){
 
-  geometry_msgs::Twist robot_cmd_vel;
-  if(msg->DistBall*(.01) > .5) {
-    float vel = (msg->DistBall*(.01) - .5 );
-    robot_cmd_vel.linear.y = saturateVelocity(vel);
 
-    ROS_DEBUG_STREAM(robot_cmd_vel.linear.y);
-  }
-  chatter_pub.publish(robot_cmd_vel);
 
   // if(missionPhase == 1){
   //   // rotate the robot 
@@ -48,89 +76,70 @@ void call_back_vision(const robot_control::RobotVision::ConstPtr& msg){
   //   // compute all information required
   // }
   // if(missionPhase == 2){
-  //   // get the ball at the center 
-  //     // provide a reactive control for the robot 
-  // // the cmd_vel should use angular to orient the ball at the center of image 
-  // // use gain*(x-x') for setting cmd_vel ang
+
+  //   get the ball at the center 
+  //   provide a reactive control for the robot 
+  //   the cmd_vel should use angular to orient the ball at the center of image 
+  //   use gain*(x-x') for setting cmd_vel an
+	geometry_msgs::Twist robot_cmd_vel;
+	if(msg->DistBall*(.01) > .5) {
+		int xerror = ( (imageInfo.first) - msg->BallCenterX);
+		//if ball is on left of center => + xerror => + rotation  
+		//if ball is on right of center => - xerror => - rotation
+		if(std::abs(xerror) < center_threshold*(imageInfo.first)){
+			robot_cmd_vel.angular.z  = 0;
+			ROS_DEBUG_STREAM("xerror is in range : " );
+			// missionPhase = 2;
+
+        robot_control::BallPose srv;
+        srv.request.dist = msg->DistBall;
+        if (client.call(srv))
+        {
+          ROS_INFO("BallPose service request complete");
+        }
+        else
+        {
+          ROS_ERROR("BallPose service request failed");
+        }
+
+		}
+		else{
+			float vel = float(xerror)/(imageInfo.first);
+			robot_cmd_vel.angular.z = saturateVelocity(vel,false);
+			ROS_DEBUG_STREAM("xerror is very large : " );
+		}
+		cmdVel_pub.publish(robot_cmd_vel);
+	  }
+
   // }
   // if(missionPhase == 3){
   //     // if the bal is sufficiently at the center 
   // // stop the velocity command (set them to 00)-> for angular 
   // // move towards the ball (lin + angular) while keeping the ball at the center 
+  // 	// 
   // }
-  // if(missionPhase == 4){
-  //   // if are very close to the ball 
-  //   // keep going straight and check if
-  //   // pushed too much -> change phase 
-  //   // keep pushing 
-  // }
+	// if(){
+	// 	// alignment objective 
+	// }
+  if(missionPhase == 3){
+    // if are very close to the ball 
+    // keep going straight and check if
+    // pushed too much -> change phase 
+    // keep pushing 
+	  geometry_msgs::Twist robot_cmd_vel;
+	  if(msg->DistBall*(.01) > .5) {
+	    float vel = (msg->DistBall*(.01) - .5 );
+	    robot_cmd_vel.linear.y = saturateVelocity(vel,true);
+
+	    ROS_DEBUG_STREAM(robot_cmd_vel.linear.y);
+	  }
+	  cmdVel_pub.publish(robot_cmd_vel);
+
+  }
 
 
 }
 
-void call_back(){
-
-
-
-}
-
-// void printMap(){
-//   for (int i = 0; i < Utility::nRowMap; i++) 
-//   { 
-//     std::string temp;
-//      for (int j = 0; j < Utility::nColMap; j++) 
-//      { 
-//        temp = temp + std::to_string(Utility::Map[i][j]) + " "; 
-//      } 
-//      // std::cout << endl; 
-//      ROS_DEBUG_STREAM("Server: " << temp);
-//   }
-// }
-
-// bool response_node(spawn_onmi::node::Request  &req,
-//          spawn_onmi::node::Response &res)
-// {
-
-//   bool health = Utility::updateMap(req.cRow, req.cCol);
-
-//   if(health == false){
-//     ROS_ERROR_STREAM("Server: Something went wrong while updating the map");
-//     return false;
-//   }
-
-//   // default values
-//   res.nRow = req.cRow;
-//   res.nCol = req.cCol;
-
-//   res.isComplete = Utility::isComplete();
-//   if(res.isComplete){
-//       ROS_DEBUG_STREAM("Server: Exploration is complete!");
-//   }
-
-//   int resNextRow, resNextCol;
-//   res.isNext = Utility::pickNext(req.cRow, req.cCol,resNextRow, resNextCol);
-
-//   if(res.isNext){
-//     res.nRow = resNextRow;
-//     res.nCol = resNextCol;
-//   }  
-//   ROS_DEBUG_STREAM("Server: " << "b");
-//   printMap();
-//   return true;
-// }
-
-// bool response_initnode(spawn_onmi::initnode::Request  &req,
-//          spawn_onmi::initnode::Response &res){
-
-//   bool health = Utility::initMap(req.robotRow, req.robotCol);
-//   res.clash = !(health);
-
-//   ROS_DEBUG_STREAM("Server: " << "c");
-//   printMap();
-
-//   return true;
-
-// }
 
 
 
@@ -143,29 +152,10 @@ int main(int argc, char **argv)
   if( ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug) )
     ros::console::notifyLoggerLevelsChanged();
 
-  // std::string mapAbsPath;
-  // int mapRow;
-  // int mapCol;
-
-  // n.getParam("map_row", mapRow);
-  // n.getParam("map_col",mapCol);
-  // n.getParam("map_abs_path",mapAbsPath);
-
-  // bool cond1 = Utility::updateParams(mapRow,mapCol);
-  // bool cond2 = Utility::getFileContent(mapAbsPath);
-
-  // if(cond1 != true || cond2 != true){
-  //   ROS_ERROR_STREAM("Server: Error while loading the map_abs_path file ");
-  //   ROS_ERROR_STREAM("Server: Please check the size of map_row and map_col matches the input in map_abs_path file");
-  //   return 0;
-
-  // } 
-
-  // ros::ServiceServer service = n.advertiseService("node_info", response_node);
-  // ros::ServiceServer service_initnode = n.advertiseService("node_init", response_initnode);
-
   ros::Subscriber sub = n.subscribe("/robot_vision", 1000, call_back_vision);
-  chatter_pub = n.advertise<geometry_msgs::Twist>("/cmd_vel", 1000);
+  client = n.serviceClient<robot_control::BallPose>("/ball_pose_srv");
+
+  cmdVel_pub = n.advertise<geometry_msgs::Twist>("/cmd_vel", 1000);
 
   // printMap();
 

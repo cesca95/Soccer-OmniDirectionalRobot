@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<launch>
+
+  <!-- Map server -->
+  <include file="$(find robot_map)/launch/robot_map.launch"/>
+
+
+ <!-- defining the position of the robot -->
+  <arg name="x1" default="0"/>
+  <arg name="y1" default="0"/>
+  
+ <node pkg="tf" type="static_transform_publisher" name="odom_to_map"
+    args="0 0  0  0 0 0  map odom 100" />
+
+
+  <!-- Rviz -->
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find launch_pkg)/rviz/viz_config.rviz" />
+
+</launch>

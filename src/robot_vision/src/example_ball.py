@@ -42,13 +42,18 @@ class image_feature:
             RobotVision, queue_size=1)
 
         # subscribed Topic
-        self.subscriber = rospy.Subscriber("/rrbot/camera1/image_raw/compressed",
-            CompressedImage, self.callback,  queue_size = 1)
+        self.image_sub = rospy.Subscriber("/rrbot/camera1/image_raw/compressed",
+            CompressedImage, self.callback_image,  queue_size = 1)
+        # self.odom_sub = rospy.Subscriber("/odom",
+        #     Odometry, self.callback_odom,  queue_size = 1)
+
+
         if VERBOSE :
             print "subscribed to /rrbot/camera1/image_raw"
 
 
-    def callback(self, ros_data):
+
+    def callback_image(self, ros_data):
         '''Callback function of subscribed topic. 
         Here images get converted and features detected'''
         if VERBOSE :
@@ -86,8 +91,13 @@ class image_feature:
             # centroid
             c = max(cnts, key=cv2.contourArea)
             ((x, y), radius) = cv2.minEnclosingCircle(c)
+            # print((x,y))
+
             M = cv2.moments(c)
             center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
+            # control_info.GoalX = center[0]
+            # control_info.GoalY = center[1]
+            # print(center)
 
             dist = -1
             # only proceed if the radius meets a minimum size
@@ -99,15 +109,15 @@ class image_feature:
                 cv2.circle(image_np, center, 5, (0, 0, 255), -1)
                 dist = (foallength_pixels*(20))/(radius)
 
-            control_info.BallCenterX = np.uint8(int(x)) 
-            control_info.BallCenterY = np.uint8(int(y))
+            control_info.BallCenterX = center[0]
+            control_info.BallCenterY = center[1]
             control_info.Ball  = 1
             control_info.BallRadius = np.uint8(int(radius))
             control_info.DistBall = dist
 
             self.info_pub.publish(control_info)
-        # update the points queue
-        #pts.appendleft(center)
+            # update the points queue
+            #pts.appendleft(center)
             cv2.imshow('window', image_np)
             cv2.waitKey(2)
 

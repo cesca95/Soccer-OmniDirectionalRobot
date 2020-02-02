@@ -5,14 +5,14 @@ Header header
 bool Ball
 bool Goal
 
-uint8 BallCenterX
-uint8 BallCenterY 
-uint8 BallRadius
+int32 BallCenterX
+int32 BallCenterY 
+int32 BallRadius
 
-uint8 GoalX
-uint8 GoalY
-uint8 GoalW
-uint8 GoalH
+int32 GoalX
+int32 GoalY
+int32 GoalW
+int32 GoalH
 
 float32 DistBall
 float32 DistGoal
