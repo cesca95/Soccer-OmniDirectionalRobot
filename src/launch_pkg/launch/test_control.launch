@@ -1,18 +1,10 @@
 <?xml version="1.0"?>
 <launch>
 
-  <!-- Map server -->
-  <include file="$(find robot_map)/launch/robot_map.launch"/>
-
-
- <!-- defining the position of the robot -->
-  <arg name="x1" default="0"/>
-  <arg name="y1" default="0"/>
-  
- <node pkg="tf" type="static_transform_publisher" name="odom_to_map"
-    args="0 0  0  0 0 0  map odom 100" />
  
  <node pkg="robot_control" type="central_control_node" name="central_control_node" />
  <node pkg="robot_vision" type="example_ball.py" name="example_ball" />
+ <node pkg ="robot_control" type="BallPosePub.py" name="BallPosePub"/>
+ <node pkg ="robot_vision" type="fake_laser.py" name="fake_laser"/>
 
 </launch>

@@ -39,6 +39,9 @@ class ball_pose:
         '''Initialize ros publisher, ros subscriber'''
         self.odom_sub = rospy.Subscriber("odom",
             Odometry, self.callback_odom,  queue_size = 1)
+
+        self.camera_x = 0.125
+        self.camera_y = 0
         
         self.ball_srv = rospy.Service('/ball_pose_srv', BallPose, self.handle_ball_pose)
         self.ballpose_pub = rospy.Publisher('/ball_pose_pub', Pose2D,  queue_size=10)
@@ -64,16 +67,28 @@ class ball_pose:
         quaternion = odom_data.pose.pose.orientation
         explicit_quat = [quaternion.x, quaternion.y, quaternion.z, quaternion.w]
         euler = tf.transformations.euler_from_quaternion(explicit_quat)
+        rospy.loginfo("euler " )
+        rospy.loginfo(euler[0] )
+        rospy.loginfo(euler[1])
+        rospy.loginfo(euler[2])
         self.odom_pose.theta = euler[2]
+
+        rospy.loginfo(" ang " )
+        rospy.loginfo(self.odom_pose.theta )
 
         if self.odom_status == False:
             self.odom_status = True
 
         if self.ball_dist != 0 and self.odom_status :
             # calculate the Pose2D
-            self.ball_pose.x = self.odom_pose.x + math.cos(self.odom_pose.theta)
-            self.ball_pose.y = self.odom_pose.y + math.sin(self.odom_pose.theta)
+            theta_right = -1*self.odom_pose.theta
+            self.ball_pose.x = self.odom_pose.x  + math.cos(theta_right)*(self.camera_x + self.ball_dist)
+            self.ball_pose.y = self.odom_pose.y  + math.sin(theta_right)*(self.camera_y + self.ball_dist)
             self.ball_pose.theta = 0
+
+            rospy.loginfo(self.ball_pose.x)
+            rospy.loginfo(self.ball_pose.y)
+
             self.ballpose_pub.publish(self.ball_pose)
 
 

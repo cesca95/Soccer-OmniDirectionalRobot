@@ -69,7 +69,7 @@ float saturateVelocity(float vel, bool lin_ang){
 void call_back_vision(const robot_control::RobotVision::ConstPtr& msg){
 
 
-
+  float ballDist =  msg->DistBall; // in mmm
   // if(missionPhase == 1){
   //   // rotate the robot 
   //   // save the ball angle 
@@ -82,7 +82,7 @@ void call_back_vision(const robot_control::RobotVision::ConstPtr& msg){
   //   the cmd_vel should use angular to orient the ball at the center of image 
   //   use gain*(x-x') for setting cmd_vel an
 	geometry_msgs::Twist robot_cmd_vel;
-	if(msg->DistBall*(.01) > .5) {
+	// if(ballDist*(.001) > .5) {
 		int xerror = ( (imageInfo.first) - msg->BallCenterX);
 		//if ball is on left of center => + xerror => + rotation  
 		//if ball is on right of center => - xerror => - rotation
@@ -92,7 +92,7 @@ void call_back_vision(const robot_control::RobotVision::ConstPtr& msg){
 			// missionPhase = 2;
 
         robot_control::BallPose srv;
-        srv.request.dist = msg->DistBall;
+        srv.request.dist = ballDist;
         if (client.call(srv))
         {
           ROS_INFO("BallPose service request complete");
@@ -109,7 +109,7 @@ void call_back_vision(const robot_control::RobotVision::ConstPtr& msg){
 			ROS_DEBUG_STREAM("xerror is very large : " );
 		}
 		cmdVel_pub.publish(robot_cmd_vel);
-	  }
+	  // }
 
   // }
   // if(missionPhase == 3){
@@ -127,8 +127,8 @@ void call_back_vision(const robot_control::RobotVision::ConstPtr& msg){
     // pushed too much -> change phase 
     // keep pushing 
 	  geometry_msgs::Twist robot_cmd_vel;
-	  if(msg->DistBall*(.01) > .5) {
-	    float vel = (msg->DistBall*(.01) - .5 );
+	  if(ballDist > .05) {
+	    float vel = (ballDist - .05 );
 	    robot_cmd_vel.linear.y = saturateVelocity(vel,true);
 
 	    ROS_DEBUG_STREAM(robot_cmd_vel.linear.y);

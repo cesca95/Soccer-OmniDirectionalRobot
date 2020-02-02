@@ -113,7 +113,7 @@ class image_feature:
             control_info.BallCenterY = center[1]
             control_info.Ball  = 1
             control_info.BallRadius = np.uint8(int(radius))
-            control_info.DistBall = dist
+            control_info.DistBall = dist*(0.001)
 
             self.info_pub.publish(control_info)
             # update the points queue
