@@ -85,6 +85,7 @@ class image_feature:
 
         # for the control part of the project
         control_info = RobotVision()
+        control_info.Ball = False
         if len(cnts) > 0:
             # find the largest contour in the mask, then use
             # it to compute the minimum enclosing circle and
@@ -114,15 +115,12 @@ class image_feature:
             control_info.Ball  = 1
             control_info.BallRadius = np.uint8(int(radius))
             control_info.DistBall = dist*(0.001)
-
-            self.info_pub.publish(control_info)
             # update the points queue
             #pts.appendleft(center)
             cv2.imshow('window', image_np)
             cv2.waitKey(2)
-
-          
-            #self.subscriber.unregister()
+            control_info.Ball = True
+        self.info_pub.publish(control_info)
 
 def main(args):
     '''Initializes and cleanup ros node'''

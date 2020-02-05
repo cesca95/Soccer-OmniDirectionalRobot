@@ -23,7 +23,7 @@ from sensor_msgs.msg import CompressedImage
 from sensor_msgs.msg import Image
 
 from robot_control.msg import RobotVision
-from robot_control.srv import BallPose
+from robot_control.srv import BallPose, BallPoseResponse
 from nav_msgs.msg import Odometry
 import tf
 # from std_msgs.msg import Float64
@@ -52,13 +52,21 @@ class ball_pose:
         self.ball_dist = 0
 
         self.odom_status = False;
+        self.ballpose_cal = False
 
     def handle_ball_pose(self,req):
         # print "Returning [%s + %s = %s]"%(req.a, req.b, (req.a + req.b))
 
         rospy.loginfo("handle_ball_pose")
         self.ball_dist = req.dist
-        return True
+        while(self.ballpose_cal == False):
+            print("working")
+            # keep stalling 
+        resp = BallPoseResponse()
+        resp.x = self.ball_pose.x
+        resp.y = self.ball_pose.x
+        resp.status = True
+        return resp
 
     def callback_odom(self, odom_data):
         rospy.loginfo("callback_odom")
@@ -67,9 +75,7 @@ class ball_pose:
         quaternion = odom_data.pose.pose.orientation
         explicit_quat = [quaternion.x, quaternion.y, quaternion.z, quaternion.w]
         euler = tf.transformations.euler_from_quaternion(explicit_quat)
-        rospy.loginfo("euler " )
-        rospy.loginfo(euler[0] )
-        rospy.loginfo(euler[1])
+
         rospy.loginfo(euler[2])
         self.odom_pose.theta = euler[2]
 

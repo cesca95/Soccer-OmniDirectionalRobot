@@ -4,7 +4,7 @@
 
   <!-- Starting our world scenario -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">	    
-	<arg name="world_name" value="$(find myrobot_gazebo)/worlds/ball_left.world"/>	    
+	<arg name="world_name" value="$(find myrobot_gazebo)/worlds/myworld.world"/>	    
 	<arg name="gui" value="true"/>	  
 	<arg name="paused" value="false"/>
   </include>	
