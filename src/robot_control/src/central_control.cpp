@@ -266,8 +266,8 @@ int main(int argc, char **argv)
   if( ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug) )
     ros::console::notifyLoggerLevelsChanged();
 
-  ros::Subscriber sub_vision = n.subscribe("/robot_vision", 1000, call_back_vision);
-  ros::Subscriber sub_odom = n.subscribe("/odom", 1000, odom_call_back);
+  ros::Subscriber sub_vision = n.subscribe("/robot_vision", 10, call_back_vision);
+  ros::Subscriber sub_odom = n.subscribe("/odom", 100, odom_call_back);
   // ros::Subscriber sub_move_vel = n.subscribe("/move_base/out_cmd_vel", 1000, call_back_move_base_vel);
 
   client = n.serviceClient<robot_control::BallPose>("/ball_pose_srv");
