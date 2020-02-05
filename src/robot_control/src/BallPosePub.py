@@ -51,8 +51,9 @@ class ball_pose:
 
         self.ball_dist = 0
 
-        self.odom_status = False;
+        self.odom_status = False
         self.ballpose_cal = False
+        self.distnew = False
 
     def handle_ball_pose(self,req):
         # print "Returning [%s + %s = %s]"%(req.a, req.b, (req.a + req.b))
@@ -66,6 +67,7 @@ class ball_pose:
         resp.x = self.ball_pose.x
         resp.y = self.ball_pose.x
         resp.status = True
+        self.distnew = True
         return resp
 
     def callback_odom(self, odom_data):
@@ -85,7 +87,7 @@ class ball_pose:
         if self.odom_status == False:
             self.odom_status = True
 
-        if self.ball_dist != 0 and self.odom_status :
+        if self.ball_dist != 0 and self.odom_status and self.distnew:
             # calculate the Pose2D
             theta_right = -1*self.odom_pose.theta
             self.ball_pose.x = self.odom_pose.x  + math.cos(theta_right)*(self.camera_x + self.ball_dist)
@@ -96,6 +98,11 @@ class ball_pose:
             rospy.loginfo(self.ball_pose.y)
 
             self.ballpose_pub.publish(self.ball_pose)
+            self.ballpose_cal  = True
+            self.distnew = False
+        else:
+            self.ballpose_pub.publish(self.ball_pose)
+
 
 
 def main(args):

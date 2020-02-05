@@ -65,7 +65,7 @@ float saturateVelocity(float vel, bool lin_ang){
 
   if(lin_ang == true){
   	// linear velocity saturation 
-  	  if(vel > 0.1){
+  	 if(vel > 0.1){
 	    vel = 0.1;
 	  }
 	  if(vel < 0.02) vel = 0.02;
@@ -188,11 +188,13 @@ void call_back_vision(const robot_control::RobotVision::ConstPtr& msg){
       geometry_msgs::Twist robot_cmd_vel;
     
       int xerror = ( (imageInfo.first) - msg->BallCenterX);
+      ROS_DEBUG_STREAM("the error is: " << xerror);
+      ROS_DEBUG_STREAM("Threshold is: "  << center_threshold*(imageInfo.first));
       //if ball is on left of center => + xerror => + rotation  
       //if ball is on right of center => - xerror => - rotation
       if(std::abs(xerror) < center_threshold*(imageInfo.first)){
         robot_cmd_vel.angular.z  = 0;
-        ROS_DEBUG_STREAM("xerror is in range : " );
+        ROS_DEBUG_STREAM("xerror is in range : "  << center_threshold*(imageInfo.first));
 
           robot_control::BallPose srv;
           srv.request.dist = ballDist_global;
@@ -210,7 +212,7 @@ void call_back_vision(const robot_control::RobotVision::ConstPtr& msg){
             // if(navigation_status = false){
 
             // }
-          missionPhase = 3;
+          // missionPhase = 3;
     }
     else{
       float vel = float(xerror)/(imageInfo.first);
@@ -265,7 +267,7 @@ int main(int argc, char **argv)
     ros::console::notifyLoggerLevelsChanged();
 
   ros::Subscriber sub_vision = n.subscribe("/robot_vision", 1000, call_back_vision);
-  ros::Subscriber sub_odom = n.subscribe("/odom", 1000, call_back_vision);
+  ros::Subscriber sub_odom = n.subscribe("/odom", 1000, odom_call_back);
   // ros::Subscriber sub_move_vel = n.subscribe("/move_base/out_cmd_vel", 1000, call_back_move_base_vel);
 
   client = n.serviceClient<robot_control::BallPose>("/ball_pose_srv");
