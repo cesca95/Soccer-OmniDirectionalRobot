@@ -62,8 +62,8 @@ class ball_pose:
         if self.odom:
             self.ballpose_cal = True # semaphore status 
             theta_right = self.odom_pose.theta
-            self.ball_pose.x = self.odom_pose.x  + math.cos(math.pi/2 + theta_right)*(self.camera_y + self.ball_dist)
-            self.ball_pose.y = self.odom_pose.y  + math.sin(math.pi/2 + theta_right)*(self.camera_y + self.ball_dist)
+            self.ball_pose.x = self.odom_pose.x  + math.cos(theta_right)*(self.camera_y + self.ball_dist)
+            self.ball_pose.y = self.odom_pose.y  + math.sin(theta_right)*(self.camera_y + self.ball_dist)
             self.ball_pose.theta = 0
             self.ballpose_cal = False
             rospy.loginfo("**************ball pose****************")

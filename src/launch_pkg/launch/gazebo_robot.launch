@@ -11,9 +11,12 @@
 
 
  <!-- defining the position of the robot -->
-  <arg name="x1" default="0"/>
-  <arg name="y1" default="0"/>
-
+  <arg name="x" default="0"/>
+  <arg name="y" default="0"/>
+  <arg name="z" default="0.05"/>
+  <arg name="roll" default="0"/>
+  <arg name="pitch" default="0"/>
+  <arg name="yaw" default="1.57"/>
 
    <!-- Load the URDF into the ROS Parameter Server -->
   <param name="robot_description" 
@@ -23,8 +26,7 @@
   <!-- launching the spawner and the controller for myrobot -->
   
     <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
-          args="-urdf -model myrobot -param robot_description -x $(arg x1) -y $(arg y1) -z 0.05"/>
-     <!-- <node name="my_tf_broadcaster" pkg="myrobot_control" type="turtle_tf_broadcaster" /> --> 
+          args="-urdf -model myrobot -param robot_description -x $(arg x) -y $(arg y) -z $(arg y) -R $(arg roll) -P $(arg pitch) -Y $(arg yaw)"/>
    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
    <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />     
 

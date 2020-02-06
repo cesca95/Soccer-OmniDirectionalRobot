@@ -2,7 +2,7 @@
 <launch>
 
  
- <node pkg="robot_control" type="central_control_node" name="central_control_node" />
+ <!--<node pkg="robot_control" type="central_control_node" name="central_control_node" />-->
  <node pkg="robot_vision" type="example_ball.py" name="example_ball" />
  <node pkg ="robot_control" type="BallPosePub.py" name="BallPosePub"/>
  <node pkg ="robot_vision" type="fake_laser.py" name="fake_laser"/>
