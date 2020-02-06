@@ -37,7 +37,7 @@ from geometry_msgs.msg import Pose2D
 from nav_msgs.msg import Odometry
 
 laserScan = LaserScan()  
-laserScan.header.frame_id = "laser" 
+laserScan.header.frame_id = "odom" 
 laserScan.angle_min = -3.14
 laserScan.angle_max = 3.13
 laserScan.range_min = 0
@@ -78,9 +78,9 @@ def laserScan_cal(y, x):
 
 	if end < start:
 		output_scan[start:size_output] = dist_ball
-		output_scan[0:end+1] = dist_ball
+		output_scan[0:end] = dist_ball
 	else:
-		output_scan[start:end+1] = dist_ball
+		output_scan[start:end] = dist_ball
 
 
 	return output_scan
@@ -113,7 +113,7 @@ def odom_callback(odom_data):
 		rospy.loginfo(laserScan.header.stamp)
 		# rospy.loginfo(laserScan.header.stamp.nsecs )
 
-		laserScan.ranges = laserScan_cal(ballPose_x,ballPose_y)
+		laserScan.ranges = laserScan_cal(ballPose_y,ballPose_x)
 		seq += 1
 		# prevTime = laserScan.scan_time
 		fakescan_pub.publish(laserScan)
