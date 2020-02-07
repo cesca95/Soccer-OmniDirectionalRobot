@@ -4,8 +4,8 @@
 
 
 <!-- ROBOT -->
-	<xacro:property name="length_wheel" value="0.05" />
-	<xacro:property name="radius_wheel" value="0.05" />
+	<xacro:property name="length_wheel" value="0.036" />
+	<xacro:property name="radius_wheel" value="0.04" />
 
 	<xacro:macro name="default_inertial" params="mass">
                <inertial>
@@ -25,19 +25,19 @@
 	<link name="base_link">
    		<visual>
      			<geometry>
-       				<box size="0.3 0.2 0.1"/>
+       				<box size="0.205 0.155 0.02"/>
      			</geometry>
-			<origin rpy="0 0 0" xyz="0 0 0.05"/>
+			<origin rpy="0 0 0" xyz="0 0 0.04"/>
 			<material name="white">
 				<color rgba="1 1 1 1"/>
 			</material>
    		</visual>
 		<collision>
 			<geometry>
-       				<box size="0.3 0.2 0.1"/>
+       				<box size="0.205 0.155 0.02"/>
 			</geometry>
 		</collision>
-		<xacro:default_inertial mass="10"/>
+		<xacro:default_inertial mass="1"/>
 				
  	</link>
 
@@ -52,7 +52,7 @@
 		<collision>
 			<xacro:wheel_geometry />
 		</collision>
-		<xacro:default_inertial mass="1"/>
+		<xacro:default_inertial mass="0.01"/>
  	</link>
 
  	<link name="wheel_2">
@@ -64,7 +64,7 @@
 		<collision>
 			<xacro:wheel_geometry />
 		</collision>
-		<xacro:default_inertial mass="1"/>
+		<xacro:default_inertial mass="0.01"/>
  	</link>
     
  	<link name="wheel_3">
@@ -76,7 +76,7 @@
 		<collision>
 			<xacro:wheel_geometry />
 		</collision>
-		<xacro:default_inertial mass="1"/>
+		<xacro:default_inertial mass="0.01"/>
  	</link>
 
  	<link name="wheel_4">
@@ -88,42 +88,42 @@
 		<collision>
 			<xacro:wheel_geometry />
 		</collision>
-		<xacro:default_inertial mass="1"/>
+		<xacro:default_inertial mass="0.01"/>
  	</link>
 
  	<joint name="base_to_wheel1" type="continuous">
 		<parent link="base_link"/>
 		<child link="wheel_1"/>
                 <axis xyz="1 0 0"/>
-		<origin xyz="0.1 0.1 0"/>
+		<origin xyz="0.05 0.098 0.04"/>
 	</joint>
 	
 	<joint name="base_to_wheel2" type="continuous">
 		<parent link="base_link"/>
 		<child link="wheel_2"/>
                 <axis xyz="1 0 0"/>
-		<origin xyz="-0.1 0.1 0"/>
+		<origin xyz="-0.05 0.098 0.04"/>
 	</joint>
 	
 	<joint name="base_to_wheel3" type="continuous">
 		<parent link="base_link"/>
 		<child link="wheel_3"/>
                 <axis xyz="1 0 0"/>
-		<origin xyz="0.1 -0.1 0"/>
+		<origin xyz="0.05 -0.098 0.04"/>
 	</joint>
 	
 	<joint name="base_to_wheel4" type="continuous">
 		<parent link="base_link"/>
 		<child link="wheel_4"/>
                 <axis xyz="1 0 0"/>
-		<origin xyz="-0.1 -0.1 0"/>
+		<origin xyz="-0.05 -0.098 0.04"/>
 	</joint>
 
 
 <!-- CAMERA -->
 	 <joint name="camera_joint" type="fixed">
 	    <axis xyz="-1 0 0" />
-	    <origin xyz="0.125 0 0.125" rpy="0 0 0"/>
+	    <origin xyz="0.090 0 0.06" rpy="0 0 0"/>
 	    <parent link="base_link"/>
 	    <child link="camera_link"/>
 	  </joint>
@@ -133,14 +133,14 @@
 	    <collision>
 	      <origin xyz="0 0 0" rpy="0 0 0"/>
 	      <geometry>
-		<box size="0.05 0.05 0.05"/>
+		<box size="0.01 0.05 0.05"/>
 	      </geometry>
 	    </collision>
 
 	    <visual>
 	      <origin xyz="0 0 0" rpy="0 0 0"/>
 	      <geometry>
-		<box size="0.05 0.05 0.05"/>
+		<box size="0.01 0.05 0.05"/>
 	      </geometry>
 	      <material name="red">
 		<color rgba="1 0 0 1"/>
