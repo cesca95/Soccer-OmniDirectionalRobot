@@ -55,28 +55,8 @@
 
     <remap from="odom" to="$(arg odom_topic)"/>
     <remap from="scan" to="$(arg laser_topic)"/>
+    <!--<remap from="cmd_vel" to="/move_base/out_cmd_vel"/> -->
   </node>
-
-  <!-- move_base -->
-
-  <!--<arg name="model" default="$(env TURTLEBOT3_MODEL)" doc="model type [burger, waffle, waffle_pi]"/>
-  <arg name="model" default="burger"/>
-  <arg name="cmd_vel_topic" default="/cmd_vel" />
-  <arg name="move_forward_only" default="false"/>
-
-  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
-    <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS" />
-    <rosparam file="$(find launch_pkg)/param/costmap_common_params_$(arg model).yaml" command="load" ns="global_costmap" />
-    <rosparam file="$(find launch_pkg)/param/costmap_common_params_$(arg model).yaml" command="load" ns="local_costmap" />
-    <rosparam file="$(find launch_pkg)/param/local_costmap_params.yaml" command="load" />
-    <rosparam file="$(find launch_pkg)/param/global_costmap_params.yaml" command="load" />
-    <rosparam file="$(find launch_pkg)/param/move_base_params.yaml" command="load" />
-    <rosparam file="$(find launch_pkg)/param/dwa_local_planner_params_$(arg model).yaml" command="load" />
-    <remap from="cmd_vel" to="$(arg cmd_vel_topic)"/>
-    <remap from="odom" to="$(arg odom_topic)"/>
-    <param name="DWAPlannerROS/min_vel_x" value="0.0" if="$(arg move_forward_only)" />
-  </node>
--->
 
 
 </launch>

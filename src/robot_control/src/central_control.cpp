@@ -47,7 +47,7 @@ float robot_y;
 float robot_theta;
 
 float ballDist_global;
-
+bool ball_camera_status = false;
 
 geometry_msgs::Twist navigation_cmd_vel;
 bool navigation_status = false;
@@ -56,12 +56,13 @@ ros::ServiceClient client;
 typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseClient;
 
 bool sendActionStatus = false;
-bool odom_update_semaphore = false;
+bool odom_update_semaphore = true; // default is true
 int missionPhase = 1;
+bool blindmode = false;
+
+
 
 float saturateVelocity(float vel, bool lin_ang){
-  // ROS_DEBUG_STREAM("start");
-  // ROS_DEBUG_STREAM(vel);
 
   int sign = 1;
   if(vel < 0) sign = -1;
@@ -70,12 +71,10 @@ float saturateVelocity(float vel, bool lin_ang){
 
   if(lin_ang == true){
   	// linear velocity saturation 
-  	 if(vel > 0.1){
-	    vel = 0.1;
+  	 if(vel > 0.5){
+	    vel = 0.5;
 	  }
 	  if(vel < 0.02) vel = 0.02;
-	  ROS_DEBUG_STREAM("end");
-	  ROS_DEBUG_STREAM(vel);
 	  return sign*vel;
   }
   else{
@@ -84,8 +83,6 @@ float saturateVelocity(float vel, bool lin_ang){
 	    vel = 0.5;
 	  }
 	  if(vel < 0.02) vel = 0.02;
-	  ROS_DEBUG_STREAM("end");
-	  ROS_DEBUG_STREAM(vel);
 	  return sign*vel;
   }
 
@@ -93,9 +90,10 @@ float saturateVelocity(float vel, bool lin_ang){
 
 // void call_back_move_base_vel(const geometry_msgs::Twist::ConstPtr& msg){
 
-// navigation_cmd_vel = msg;
-// navigation_status = true;
-// missionPhase = 2;
+//   if(sendActionStatus == true){
+//     cmdVel_pub.publish(msg);
+//     ROS_DEBUG_STREAM("Mission: 4.2");
+//   }
 // }
 
 
@@ -131,117 +129,124 @@ void odom_call_back(const nav_msgs::Odometry::ConstPtr& msg){
       robot_theta = yaw;
     }
 
-    if(missionPhase == 4){
-    // if are very close to the ball 
-    // keep going straight and check if
-    // pushed too much -> change phase 
-    // keep pushing 
     float x_sq = pow((robot_x - goal_x),2);
     float y_sq = pow((robot_y - goal_y),2);
     float robot_goal_dist = std::sqrt( x_sq + y_sq);
 
-    if(robot_goal_dist < goal_buff){
-      // kick
-      geometry_msgs::Twist robot_cmd_vel;
-      if(ballDist_global > .05) {
-        float vel = (ballDist_global - .05 );
-        robot_cmd_vel.linear.x = saturateVelocity(vel,true);
-        cmdVel_pub.publish(robot_cmd_vel);
+    // if(missionPhase == 5){
+    //   blindmode = true;
+    // if(robot_goal_dist > goal_buff){
+    //     // ToDO Add check for the ball infront of camera in vision for all red
+    //     geometry_msgs::Twist robot_cmd_vel;
+    //     float vel = 0.25;
+    //     robot_cmd_vel.linear.x = saturateVelocity(vel,true);
+    //     cmdVel_pub.publish(robot_cmd_vel);
+    //     ROS_DEBUG_STREAM("Mission: 5.1");
 
-        ROS_DEBUG_STREAM(robot_cmd_vel.linear.x);
-        ros::Duration(1).sleep();
+    //   }
+    //   else{
+    //     missionPhase = 6;
+    //   }
+    // }
+    // if(missionPhase == 6){
+    //     blindmode = true;
+    //     if(robot_goal_dist < goal_buff){
+    //   // kick
+    //     geometry_msgs::Twist robot_cmd_vel;
+    //     float vel = 0.4;
+    //     robot_cmd_vel.linear.x = saturateVelocity(vel,true);
+    //     cmdVel_pub.publish(robot_cmd_vel);
 
-        // 1 second push 
-        robot_cmd_vel.linear.x = 0;
-        cmdVel_pub.publish(robot_cmd_vel);
-        missionPhase = 1;
+    //     ROS_DEBUG_STREAM(robot_cmd_vel.linear.x);
+    //     ros::Duration(1).sleep();
 
-      }
-    }
-    else{
-      // push
-    geometry_msgs::Twist robot_cmd_vel;
-    if(ballDist_global > .05) {
-      float vel = (ballDist_global - .05 );
-      robot_cmd_vel.linear.x = saturateVelocity(vel,true);
+    //     // 1 second push 
+    //     robot_cmd_vel.linear.x = 0;
+    //     cmdVel_pub.publish(robot_cmd_vel);
+    //     missionPhase = 1;
+    //     blindmode = false;
+    //     ROS_DEBUG_STREAM("Mission: 6");
 
-      ROS_DEBUG_STREAM(robot_cmd_vel.linear.x);
-    }
-    cmdVel_pub.publish(robot_cmd_vel);
+    //   }
+    // }
 
-    }
 
   }
-}
 
 void call_back_vision(const robot_control::RobotVision::ConstPtr& msg){
-  ROS_DEBUG_STREAM("Mission: 0.0");
+  // ROS_DEBUG_STREAM("Mission: 0.0");
 
-  float ballDist_global =  msg->DistBall; // in mmm
+  if(blindmode == true) return;
+
+  ballDist_global =  msg->DistBall;
+  ball_camera_status = msg->Ball;
+
+  // ever if the ball is not seen it is mission phase 1
+  if(ball_camera_status == false) missionPhase =1;
+  
+
+  ROS_DEBUG_STREAM("Mission: phase: " << missionPhase);
   ROS_DEBUG_STREAM("sendActionStatus: " << sendActionStatus);
+  ROS_DEBUG_STREAM("ball_camera_status: " << ball_camera_status);
+
   if(sendActionStatus == false){
-    // ROS_DEBUG_STREAM("Mission: 0.1");
-    if (msg->Ball  == false){
-      //  find the ball: keep rotating 
-      geometry_msgs::Twist robot_cmd_vel;
-      robot_cmd_vel.angular.z  = 0.5;
-      ROS_DEBUG_STREAM("Mission: 0, robot_cmd_vel: " << robot_cmd_vel);
-      cmdVel_pub.publish(robot_cmd_vel);
-
+    if(missionPhase == 1){
+        if (ball_camera_status  == false){ // find the ball
+          geometry_msgs::Twist robot_cmd_vel;
+          robot_cmd_vel.angular.z  = 0.5;
+          cmdVel_pub.publish(robot_cmd_vel);
+          ROS_DEBUG_STREAM("Mission: 1.1");
+        }else{
+          missionPhase = 2; // ball  has been seen by the robot 
+        }
     }
-    else{
-      ROS_DEBUG_STREAM("Mission: 1.0");
-        // ball centring: center to the ball and find its position
-      if(missionPhase == 1){
-        ROS_DEBUG_STREAM("Mission: 1.01");
-        geometry_msgs::Twist robot_cmd_vel;
-      
-        int xerror = ( (imageInfo.first) - msg->BallCenterX);
-        ROS_DEBUG_STREAM("the error is: " << xerror);
-        ROS_DEBUG_STREAM("Threshold is: "  << center_threshold*(imageInfo.first));
-        //if ball is on left of center => + xerror => + rotation  
-        //if ball is on right of center => - xerror => - rotation
-          if(std::abs(xerror) < center_threshold*(imageInfo.first)){
-            robot_cmd_vel.angular.z  = 0;
-            ROS_DEBUG_STREAM("xerror is in range : "  << center_threshold*(imageInfo.first));
-            ROS_DEBUG_STREAM("Mission: 1.1");
+    else if(missionPhase == 2){ 
 
-              robot_control::BallPose srv;
-              srv.request.dist = ballDist_global;
-              if (client.call(srv))
-                {
-                  ball_pose_x = srv.response.x;
-                  ball_pose_y = srv.response.y;
-                  ball_pose_s = true;
-                  ROS_INFO("BallPose service request complete");
-                  cmdVel_pub.publish(robot_cmd_vel);
-                  missionPhase = 2;
-                }
-              else
-                {
-                  ROS_ERROR("BallPose service request failed");
-                  missionPhase = 1;
-                }
-          }
-          else{
+        geometry_msgs::Twist robot_cmd_vel;
+
+        int xerror = ( (imageInfo.first) - msg->BallCenterX);
+
+        if(std::abs(xerror) < center_threshold*(imageInfo.first)){
+           // stop centring
+            robot_cmd_vel.angular.z  = 0;
+            cmdVel_pub.publish(robot_cmd_vel);
+            missionPhase = 3;
+            ROS_DEBUG_STREAM("Mission: 2.1");
+
+        }
+        else{ // keep centering
             float vel = float(xerror)/(imageInfo.first);
             robot_cmd_vel.angular.z = saturateVelocity(vel,false);
-            ROS_DEBUG_STREAM("xerror is very large : " << robot_cmd_vel);
             cmdVel_pub.publish(robot_cmd_vel);
-            missionPhase = 1;
-            ROS_DEBUG_STREAM("Mission: 1.2");
+            ROS_DEBUG_STREAM("Mission: 2.2");
           }
       
      }
-
-      if(missionPhase == 2){
+     else if (missionPhase == 3){
+        robot_control::BallPose srv;
+        srv.request.dist = ballDist_global;
+        if (client.call(srv))
+        {
+          ball_pose_x = srv.response.x;
+          ball_pose_y = srv.response.y;
+          ball_pose_s = true;
+          missionPhase = 4;
+          ROS_DEBUG_STREAM("Mission: 3.1");
+        }
+      else
+        {
+          ROS_ERROR("BallPose service request failed");
+        }
+     }
+     else if(missionPhase == 4){
         //get to the ball
         // the goal will be given to move_base
+        ROS_DEBUG_STREAM("Mission: 4.1");
         sendActionStatus = true;
       }
     }
 }
-}
+
 
 
 geometry_msgs::Pose2D behind_the_ball(){
@@ -253,8 +258,8 @@ geometry_msgs::Pose2D behind_the_ball(){
   
   if(ball_pose_s){
       // set a point 20 cm  behind the ball
-      out.x = ball_pose_x - cos(out.theta)*.50;
-      out.y = ball_pose_y - sin(out.theta)*.50;
+      out.x = ball_pose_x - cos(out.theta)*.70;
+      out.y = ball_pose_y - sin(out.theta)*.70;
   }
   ROS_DEBUG_STREAM("behind_the_ball : " << out);
    ROS_DEBUG_STREAM("the_ball : " << ball_pose_x << " : " << ball_pose_y);
@@ -292,52 +297,27 @@ int main(int argc, char **argv)
   ros::Rate loop_rate(10);
   while (ros::ok())
   {
-    ROS_DEBUG_STREAM("main  1");
     if(sendActionStatus == true){
-      ROS_DEBUG_STREAM("main 2");
 
-      if(missionPhase == 2){
-        ROS_DEBUG_STREAM("main 3");
+      if(missionPhase == 4){
 
         geometry_msgs::Pose2D  goalPose2D =  behind_the_ball();
         move_base_msgs::MoveBaseGoal goal = action_handler(goalPose2D);
 
-        ROS_DEBUG_STREAM("Sending goal");
-        ROS_DEBUG_STREAM(goal);
         action_client.sendGoal(goal);
         action_client.waitForResult();
 
-
-      for(int i = 0;  i < 3;  i++){
         if(action_client.getState() == actionlib::SimpleClientGoalState::SUCCEEDED){
           ROS_INFO("Hooray, the base moved 1 meter forward");
-          missionPhase = 4;
-          break;
+          missionPhase = 5;
         }
         else{
           ROS_INFO("The base failed to move forward 1 meter for some reason");
-          return false;
         }
-      }
-        sendActionStatus = false;
-        missionPhase == 1;
-        
+
+        sendActionStatus = false;  
       }
 
-     
-
-    //  for(int i = 0;  i < 3;  i++){
-    //     if(action_client.getState() == actionlib::SimpleClientGoalState::SUCCEEDED){
-    //       ROS_INFO("Hooray, the base moved 1 meter forward");
-    //       missionPhase = 4;
-    //       break;
-    //     }
-    //     else{
-    //       ROS_INFO("The base failed to move forward 1 meter for some reason");
-    //       return false;
-    //     }
-    //   }
-    //   sendActionStatus = false;
     }
 
     ros::spinOnce();
