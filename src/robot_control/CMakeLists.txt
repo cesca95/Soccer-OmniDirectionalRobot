@@ -58,6 +58,7 @@ find_package(catkin REQUIRED COMPONENTS
  add_message_files(
    FILES
    RobotVision.msg
+   RobotCommand.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -142,6 +143,7 @@ include_directories(
 ## The recommended prefix ensures that target names across packages don't collide
 
 add_executable(central_control_node src/central_control.cpp)
+add_executable(vel_converter_node src/vel_converter.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -153,9 +155,15 @@ add_executable(central_control_node src/central_control.cpp)
 ## same as for the library above
 
 add_dependencies(central_control_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(vel_converter_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(central_control_node
+   ${catkin_LIBRARIES}
+ )
+
+target_link_libraries(vel_converter_node
    ${catkin_LIBRARIES}
  )
 

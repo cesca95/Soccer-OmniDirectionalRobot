@@ -27,13 +27,13 @@ int goalAngle;
 ros::Publisher cmdVel_pub;
 
 // camera parameters
-std::pair <int, int> imageInfo((640/2),(480/2));
+std::pair <int, int> imageInfo((320/2),(240/2));
 float camera_base = 0.125;
 
 // ************* Do not forget to set for the final work 
 float goal_x = 0.0;
 float goal_y = 2.0;
-float goal_buff = 0.5;
+float goal_buff = 0.9;
 float center_threshold = 0.05;
 
 float ball_pose_x = 0;
@@ -60,6 +60,9 @@ bool odom_update_semaphore = true; // default is true
 int missionPhase = 1;
 bool blindmode = false;
 
+int  ballImage_X;
+int  ballImage_Y;
+
 
 
 float saturateVelocity(float vel, bool lin_ang){
@@ -75,7 +78,7 @@ float saturateVelocity(float vel, bool lin_ang){
 	    vel = 0.5;
 	  }
 	  if(vel < 0.02) vel = 0.02;
-	  return sign*vel;
+	  
   }
   else{
     // angular velocity saturation 
@@ -83,8 +86,8 @@ float saturateVelocity(float vel, bool lin_ang){
 	    vel = 0.5;
 	  }
 	  if(vel < 0.02) vel = 0.02;
-	  return sign*vel;
   }
+  return sign*vel;
 
 }
 
@@ -119,7 +122,7 @@ move_base_msgs::MoveBaseGoal action_handler(geometry_msgs::Pose2D goalPose2D){
 
 void odom_call_back(const nav_msgs::Odometry::ConstPtr& msg){
 
-    if(odom_update_semaphore = true){
+    // if(odom_update_semaphore = true){
       robot_x = msg->pose.pose.position.x;
       robot_y = msg->pose.pose.position.y;
       tf2::Quaternion quat;
@@ -127,48 +130,83 @@ void odom_call_back(const nav_msgs::Odometry::ConstPtr& msg){
       double roll, pitch, yaw;
       tf2::Matrix3x3(quat).getRPY(roll, pitch, yaw);
       robot_theta = yaw;
-    }
+    // }
 
     float x_sq = pow((robot_x - goal_x),2);
     float y_sq = pow((robot_y - goal_y),2);
     float robot_goal_dist = std::sqrt( x_sq + y_sq);
 
-    // if(missionPhase == 5){
-    //   blindmode = true;
-    // if(robot_goal_dist > goal_buff){
-    //     // ToDO Add check for the ball infront of camera in vision for all red
-    //     geometry_msgs::Twist robot_cmd_vel;
-    //     float vel = 0.25;
-    //     robot_cmd_vel.linear.x = saturateVelocity(vel,true);
-    //     cmdVel_pub.publish(robot_cmd_vel);
-    //     ROS_DEBUG_STREAM("Mission: 5.1");
+    float r_x = cos(robot_theta);
+    float r_y = sin(robot_theta);
 
-    //   }
-    //   else{
-    //     missionPhase = 6;
-    //   }
-    // }
-    // if(missionPhase == 6){
-    //     blindmode = true;
-    //     if(robot_goal_dist < goal_buff){
-    //   // kick
-    //     geometry_msgs::Twist robot_cmd_vel;
-    //     float vel = 0.4;
-    //     robot_cmd_vel.linear.x = saturateVelocity(vel,true);
-    //     cmdVel_pub.publish(robot_cmd_vel);
+    float rg_x = (goal_x  - robot_x)/robot_goal_dist; // unit vector_x
+    float rg_y = (goal_y - robot_y)/ robot_goal_dist; // unit vector_y 
 
-    //     ROS_DEBUG_STREAM(robot_cmd_vel.linear.x);
-    //     ros::Duration(1).sleep();
+    // float align_theta = acos(r_x*rg_x + r_y*rg_y); 
+    float align_theta = asin(r_x*rg_y - r_y*rg_x); 
 
-    //     // 1 second push 
-    //     robot_cmd_vel.linear.x = 0;
-    //     cmdVel_pub.publish(robot_cmd_vel);
-    //     missionPhase = 1;
-    //     blindmode = false;
-    //     ROS_DEBUG_STREAM("Mission: 6");
+    if(missionPhase == 5){
 
-    //   }
-    // }
+      blindmode = true;
+      if(robot_goal_dist > goal_buff){
+          // ToDO Add check for the ball infront of camera in vision for all red
+          geometry_msgs::Twist robot_cmd_vel;
+
+          // ROS_DEBUG_STREAM("Mission: 5.1");
+
+          int xerror = ( (imageInfo.first) - ballImage_X);
+
+            // if(std::abs(xerror) > center_threshold*(imageInfo.first)){
+               // stop centring
+              robot_cmd_vel.linear.x = saturateVelocity(robot_goal_dist*0.1,true);
+
+                
+              robot_cmd_vel.angular.z  = saturateVelocity(align_theta,false);
+              robot_cmd_vel.linear.y  = saturateVelocity(float(xerror)/(imageInfo.first), true);
+              cmdVel_pub.publish(robot_cmd_vel);
+              ROS_DEBUG_STREAM("stream value:" << robot_cmd_vel);
+              ROS_DEBUG_STREAM("align_theta value:" << align_theta);
+
+            // }
+            // else{ // keep centering
+            //     float vel = float(xerror)/(imageInfo.first);
+            //     robot_cmd_vel.angular.z  = saturateVelocity(align_theta,false);
+            //     robot_cmd_vel.linear.x = saturateVelocity(robot_goal_dist*0.1,true);
+            //     cmdVel_pub.publish(robot_cmd_vel);
+            //     ROS_DEBUG_STREAM("Mission: 2.2");
+            // }
+
+
+        }
+        else{
+          missionPhase = 6;
+        }
+    }
+    if(missionPhase == 6){
+          blindmode = true;
+          // ROS_DEBUG_STREAM("Mission: 6 X:" << robot_x);
+          // ROS_DEBUG_STREAM("Mission: 6 Y:" << robot_y);
+          // ROS_DEBUG_STREAM("Mission: 6 Dist:" << robot_goal_dist);
+          // if(robot_goal_dist < goal_buff){
+        // kick
+          geometry_msgs::Twist robot_cmd_vel;
+          // float vel = 0.5;
+          // robot_cmd_vel.linear.x = saturateVelocity(vel,true);
+          robot_cmd_vel.linear.x = 0.5;
+          cmdVel_pub.publish(robot_cmd_vel);
+
+          ROS_DEBUG_STREAM(robot_cmd_vel.linear.x);
+          ros::Duration(0.5).sleep();
+
+          // 1 second push 
+          robot_cmd_vel.linear.x = 0;
+          cmdVel_pub.publish(robot_cmd_vel);
+          missionPhase = 10;
+          // blindmode = false;
+          ROS_DEBUG_STREAM("Mission: 6");
+
+      // }
+    }
 
 
   }
@@ -176,10 +214,12 @@ void odom_call_back(const nav_msgs::Odometry::ConstPtr& msg){
 void call_back_vision(const robot_control::RobotVision::ConstPtr& msg){
   // ROS_DEBUG_STREAM("Mission: 0.0");
 
-  if(blindmode == true) return;
-
   ballDist_global =  msg->DistBall;
   ball_camera_status = msg->Ball;
+  ballImage_X = msg->BallCenterX;
+  ballImage_Y = msg->BallCenterY;
+
+  if(blindmode == true) return;
 
   // ever if the ball is not seen it is mission phase 1
   if(ball_camera_status == false) missionPhase =1;
@@ -258,8 +298,8 @@ geometry_msgs::Pose2D behind_the_ball(){
   
   if(ball_pose_s){
       // set a point 20 cm  behind the ball
-      out.x = ball_pose_x - cos(out.theta)*.70;
-      out.y = ball_pose_y - sin(out.theta)*.70;
+      out.x = ball_pose_x - cos(out.theta)*.40;
+      out.y = ball_pose_y - sin(out.theta)*.40;
   }
   ROS_DEBUG_STREAM("behind_the_ball : " << out);
    ROS_DEBUG_STREAM("the_ball : " << ball_pose_x << " : " << ball_pose_y);

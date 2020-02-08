@@ -24,6 +24,9 @@
  <node pkg="robot_vision" type="example_ball.py" name="example_ball" />
  <node pkg ="robot_control" type="BallPosePub.py" name="BallPosePub"/>
  <node pkg ="robot_vision" type="fake_laser.py" name="fake_laser"/>
+ <node pkg ="robot_control" type="vel_converter_node" name="vel_converter_node"/>
+
+
 
 
 

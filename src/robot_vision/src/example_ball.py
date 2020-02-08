@@ -23,8 +23,8 @@ from sensor_msgs.msg import Image
 from robot_control.msg import RobotVision
 
 import math
-res_width = 640
-res_height = 480
+res_width = 320
+res_height = 240
 foallength_pixels = res_width/(2*math.tan(math.radians(62.2)/2));
 
 VERBOSE=True
@@ -34,18 +34,12 @@ class image_feature:
     def __init__(self):
         '''Initialize ros publisher, ros subscriber'''
         # topic where we publish
-        #self.image_pub = rospy.Publisher("/output/image_raw/compressed",
-        #    CompressedImage, queue_size=1)
-
-
         self.info_pub = rospy.Publisher("/robot_vision",
             RobotVision, queue_size=1)
 
         # subscribed Topic
         self.image_sub = rospy.Subscriber("/rrbot/camera1/image_raw/compressed",
             CompressedImage, self.callback_image,  queue_size = 1)
-        # self.odom_sub = rospy.Subscriber("/odom",
-        #     Odometry, self.callback_odom,  queue_size = 1)
 
 
         if VERBOSE :
@@ -76,7 +70,7 @@ class image_feature:
         mask = mask1|mask2
         mask = cv2.erode(mask, None, iterations=2)
         mask = cv2.dilate(mask, None, iterations=2)
-        #cv2.imshow('mask', mask)
+        cv2.imshow('mask', mask)
         cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL,
             cv2.CHAIN_APPROX_SIMPLE)
         cnts = imutils.grab_contours(cnts)
@@ -108,13 +102,13 @@ class image_feature:
                 cv2.circle(image_np, (int(x), int(y)), int(radius),
                     (0, 255, 255), 2)
                 cv2.circle(image_np, center, 5, (0, 0, 255), -1)
-                dist = (foallength_pixels*(20))/(radius)
+                dist = (foallength_pixels*(10))/(radius)
 
             control_info.BallCenterX = center[0]
             control_info.BallCenterY = center[1]
             control_info.Ball  = 1
             control_info.BallRadius = np.uint8(int(radius))
-            control_info.DistBall = dist*(0.001)
+            control_info.DistBall = dist*(0.01)
             # update the points queue
             #pts.appendleft(center)
             cv2.imshow('window', image_np)

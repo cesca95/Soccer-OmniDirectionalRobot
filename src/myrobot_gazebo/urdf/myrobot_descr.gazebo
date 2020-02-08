@@ -40,13 +40,13 @@ FOV 62.2 deg -> 1.08559479474
       <camera name="head">
         <horizontal_fov>1.08559479474</horizontal_fov>
         <image>
-          <width>640</width>
-          <height>480</height>
+          <width>320</width>
+          <height>240</height>
           <format>R8G8B8</format>
         </image>
         <clip>
-          <near>0.02</near>
-          <far>300</far>
+          <near>0.01</near>
+          <far>10</far>
         </clip>
         <noise>
           <type>gaussian</type>
@@ -75,20 +75,5 @@ FOV 62.2 deg -> 1.08559479474
       </plugin>
     </sensor>
 </gazebo>
-
-<!--
-<gazebo>
-	<plugin name="p3d_base_controller" filename="libgazebo_ros_p3d.so">
-	  <alwaysOn>true</alwaysOn>
-	  <updateRate>50.0</updateRate>
-	  <bodyName>base_link</bodyName>
-	  <topicName>odom</topicName>
-	  <gaussianNoise>0.01</gaussianNoise>
-	  <frameName>world</frameName>
-	  <xyzOffsets>0 0 0</xyzOffsets>
-	  <rpyOffsets>0 0 0</rpyOffsets>
-	</plugin>
-</gazebo>
--->
 
 </robot>

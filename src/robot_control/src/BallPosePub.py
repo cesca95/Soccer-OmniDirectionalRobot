@@ -40,8 +40,8 @@ class ball_pose:
         self.odom_sub = rospy.Subscriber("odom",
             Odometry, self.callback_odom,  queue_size = 1)
 
-        self.camera_x = 0.100
-        self.camera_y = 0.150
+        self.camera_x = 0.095
+        self.camera_y = 0
         
         self.ball_srv = rospy.Service('/ball_pose_srv', BallPose, self.handle_ball_pose)
         # self.ballpose_pub = rospy.Publisher('/ball_pose_pub', Pose2D,  queue_size=10)
@@ -62,8 +62,8 @@ class ball_pose:
         if self.odom:
             self.ballpose_cal = True # semaphore status 
             theta_right = self.odom_pose.theta
-            self.ball_pose.x = self.odom_pose.x  + math.cos(theta_right)*(self.camera_y + self.ball_dist)
-            self.ball_pose.y = self.odom_pose.y  + math.sin(theta_right)*(self.camera_y + self.ball_dist)
+            self.ball_pose.x = self.odom_pose.x  + math.cos(theta_right)*(self.camera_x + self.ball_dist)
+            self.ball_pose.y = self.odom_pose.y  + math.sin(theta_right)*(self.camera_x + self.ball_dist)
             self.ball_pose.theta = 0
             self.ballpose_cal = False
             rospy.loginfo("**************ball pose****************")
