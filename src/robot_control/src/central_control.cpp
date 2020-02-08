@@ -152,30 +152,15 @@ void odom_call_back(const nav_msgs::Odometry::ConstPtr& msg){
           // ToDO Add check for the ball infront of camera in vision for all red
           geometry_msgs::Twist robot_cmd_vel;
 
-          // ROS_DEBUG_STREAM("Mission: 5.1");
-
           int xerror = ( (imageInfo.first) - ballImage_X);
 
-            // if(std::abs(xerror) > center_threshold*(imageInfo.first)){
-               // stop centring
-              robot_cmd_vel.linear.x = saturateVelocity(robot_goal_dist*0.1,true);
-
-                
-              robot_cmd_vel.angular.z  = saturateVelocity(align_theta,false);
-              robot_cmd_vel.linear.y  = saturateVelocity(float(xerror)/(imageInfo.first), true);
-              cmdVel_pub.publish(robot_cmd_vel);
-              ROS_DEBUG_STREAM("stream value:" << robot_cmd_vel);
-              ROS_DEBUG_STREAM("align_theta value:" << align_theta);
-
-            // }
-            // else{ // keep centering
-            //     float vel = float(xerror)/(imageInfo.first);
-            //     robot_cmd_vel.angular.z  = saturateVelocity(align_theta,false);
-            //     robot_cmd_vel.linear.x = saturateVelocity(robot_goal_dist*0.1,true);
-            //     cmdVel_pub.publish(robot_cmd_vel);
-            //     ROS_DEBUG_STREAM("Mission: 2.2");
-            // }
-
+          robot_cmd_vel.linear.x = saturateVelocity(robot_goal_dist*0.1,true);
+            
+          robot_cmd_vel.angular.z  = saturateVelocity(align_theta,false);
+          robot_cmd_vel.linear.y  = saturateVelocity(float(xerror)/(imageInfo.first), true);
+          cmdVel_pub.publish(robot_cmd_vel);
+          ROS_DEBUG_STREAM("stream value:" << robot_cmd_vel);
+          ROS_DEBUG_STREAM("align_theta value:" << align_theta);
 
         }
         else{
@@ -184,14 +169,9 @@ void odom_call_back(const nav_msgs::Odometry::ConstPtr& msg){
     }
     if(missionPhase == 6){
           blindmode = true;
-          // ROS_DEBUG_STREAM("Mission: 6 X:" << robot_x);
-          // ROS_DEBUG_STREAM("Mission: 6 Y:" << robot_y);
-          // ROS_DEBUG_STREAM("Mission: 6 Dist:" << robot_goal_dist);
-          // if(robot_goal_dist < goal_buff){
-        // kick
           geometry_msgs::Twist robot_cmd_vel;
-          // float vel = 0.5;
-          // robot_cmd_vel.linear.x = saturateVelocity(vel,true);
+
+          // Assumption of correct alignment
           robot_cmd_vel.linear.x = 0.5;
           cmdVel_pub.publish(robot_cmd_vel);
 
@@ -204,15 +184,12 @@ void odom_call_back(const nav_msgs::Odometry::ConstPtr& msg){
           missionPhase = 10;
           // blindmode = false;
           ROS_DEBUG_STREAM("Mission: 6");
-
-      // }
     }
 
 
   }
 
 void call_back_vision(const robot_control::RobotVision::ConstPtr& msg){
-  // ROS_DEBUG_STREAM("Mission: 0.0");
 
   ballDist_global =  msg->DistBall;
   ball_camera_status = msg->Ball;
@@ -327,8 +304,6 @@ int main(int argc, char **argv)
 
   cmdVel_pub = n.advertise<geometry_msgs::Twist>("/cmd_vel", 1000);
   MoveBaseClient action_client("move_base", true);
-  
- // ROS_DEBUG_STREAM("1");
 
   while(!action_client.waitForServer(ros::Duration(5.0))){
     ROS_INFO("Waiting for the move_base action server to come up");
