@@ -118,7 +118,7 @@ class image_feature:
 
 def main(args):
     '''Initializes and cleanup ros node'''
-    rospy.init_node('image_feature', anonymous=True)
+    rospy.init_node('ball_detection', anonymous=True)
     ic = image_feature()
     try:
         rospy.spin()
