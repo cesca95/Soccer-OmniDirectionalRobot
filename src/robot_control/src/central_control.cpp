@@ -154,7 +154,7 @@ void odom_call_back(const nav_msgs::Odometry::ConstPtr& msg){
 
           int xerror = ( (imageInfo.first) - ballImage_X);
 
-          robot_cmd_vel.linear.x = saturateVelocity(robot_goal_dist*0.1,true);
+          robot_cmd_vel.linear.x = 0.2;//saturateVelocity(robot_goal_dist*0.1,true);
             
           robot_cmd_vel.angular.z  = saturateVelocity(align_theta,false);
           robot_cmd_vel.linear.y  = saturateVelocity(float(xerror)/(imageInfo.first), true);
@@ -171,12 +171,16 @@ void odom_call_back(const nav_msgs::Odometry::ConstPtr& msg){
           blindmode = true;
           geometry_msgs::Twist robot_cmd_vel;
 
+          int xerror = ( (imageInfo.first) - ballImage_X);
+
           // Assumption of correct alignment
           robot_cmd_vel.linear.x = 0.5;
+          robot_cmd_vel.angular.z  = saturateVelocity(align_theta,false);
+          robot_cmd_vel.linear.y  = saturateVelocity(float(xerror)/(imageInfo.first), true);
           cmdVel_pub.publish(robot_cmd_vel);
 
           ROS_DEBUG_STREAM(robot_cmd_vel.linear.x);
-          ros::Duration(0.5).sleep();
+          // ros::Duration(0.5).sleep();
 
           // 1 second push 
           robot_cmd_vel.linear.x = 0;
