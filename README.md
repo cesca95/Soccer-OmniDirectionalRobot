@@ -44,7 +44,7 @@
  - **RPi UPS POWERPACK** for raspberry
  - **Raspberry Pi Camera V2**
  
-    <p align="center">
+ <p align="center">
   <img src="project/RobotMotion_16MB.gif">
  </p>
  
@@ -85,6 +85,15 @@
   <img src="project/Node_Diagram.jpg">
  </p>
  
+- **central_node**: The central_node is the main node which implements all the mission of the finite state machine. It subscribes to odometry from gazebo and vision data from ball_detection. It is also a service client for BallPosePub and a action client for move_base. 
+- **ball_detection**: The ball_detection node subscribes to camera topics and checks if the ball is in the camera image. If the ball is present then it publishes the to /robot_vision (RobotVision.msg ) with ball status as true. It pusblished the radius and center of the ball in the image. Otherwise, a empty msg with status false is published. 
+- **gazebo**: It provides the simulation and odometry (/odom)
+- **BallPosePub**: This node has service server for getting the request of Ball's absolute position calculation from central_server. The central_server provides the details of the Ball's image as a request. Based on odometry and camera intrisic parameters, the absolute position of the ball is calculated. The publisher in this node publishes the recently calculated Ball position for the fake_laser node. 
+- **fake_laser**: Takes the absolute Ball position and converts it into a fake laser data. The laser is assumed to be at the ceneter of the map with frame "odom". 
+- **move_base**: move_base is used for path planning in mission phase 4. It takes action request from central_node to reach a desired goal postion for the robot. This goal position in our case is calculated as explained in Mission 4 above. 
+- **vel_converter**: The vel_converter is used when working with the robot hardware. It maps the vel_cmd(Twist) into strings for communication with arduino. 
+- **arduino_comm**: This node stablishes a connection with arduino and sends the values published by vel_converter to arduino board. 
+
  ### 1.4 rqt_graph 
  
   <p align="center">
