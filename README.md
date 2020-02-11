@@ -45,7 +45,7 @@
  - **Raspberry Pi Camera V2**
  
     <p align="center">
-  <img src="RobotMotion_16MB.gif">
+  <img src="project/RobotMotion_16MB.gif">
  </p>
  
  ## 2. Software Components
@@ -57,19 +57,26 @@
  
  The code can be logically divided into the following main is objectives:
  
- 1. Search Objective: 
- 2. Detect Objective:
- 3. Camera Centring Objective: Centering of the camera with the respect to the extimated radius of the red ball
- 4. Ball Position Objective: estimation of the distance of the ball with respect to the robot
- 5. Navigatio Objective: planning and navigation of the robot based on a 2d costmap
- 6. Push Ball Objective: push the ball toward the goal by keeping the contact between robot and ball
- 7. Kick Ball Objective: 
+ 1. Search Objective: Seach for the ball by rotating in positive z direction 
+ 2. Detect Objective: Detect the ball with help of OpenCV 
+ 3. Camera Centring Objective: Control the robot to keep the camera on the center of the ball 
+ 4. Ball Position Objective: Estimate the ball position using robot 2d pose and distance between ball and the robot 
+ 5. Navigatio Objective: Use move_base for navigation to desired goal position 
+ 6. Push Ball Objective: Push the ball towards the goal 
+ 7. Kick Ball Objective: Kick the ball when the robot is sufficiently close to the goal
  
  ### 2.1 Finite state machine
   
   <p align="center">
   <img src="project/FSM1.jpg">
  </p>
+ 
+ 1. **MISSION 1**: Search objective is performed with help of Detection Objective for Ball
+ 2. **MISSION 2**: Camera Centring Objective with help of Detection Objective for Ball 
+ 3. **MISSION 3**: Ball Position Objective performed using the robot pose from odometry and intrinsic camera parameter to calculate the distance between camera and ball.
+ 4. **MISSION 4**: Navigatio Objective is performed by setting a desired goal behind the ball for move_base. The goal is calculated such that the robot's x-axis is aligned with the vector joining the Ball's position and Goal(green square) position. 
+ 5. **MISSION 5**: Push Ball Objective is performed such that the Ball remains at the center of the camera as well as robot's x-axis is aligned with the vector between robot's position and Goal position 
+ 6. **MISSION 6**: Once the robot is sufficiently close to the Goal, Kick Ball Objective is performed by speeding up the robot to maxium speed for few seconds. 
  
  
   ### 2.2 Nodes diagram 
