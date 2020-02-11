@@ -9,49 +9,59 @@
   <img src="project/Sim3.gif">
  </p>
 
-### 1.1 Known information
+###  Constraints 
 
-- dimension of the arena:   240 cm x 360 cm
-- dimension of the goal:    120 cm (rectangular shape)
-- diameter of the ball:    20 cm 
-- dimension of the robot:   all the information can be found at this [link](https://www.amazon.com/OSOYOO-Robotic-Mecanum-Platform-Raspberry/dp/B07WZJYVB5/?tag=tkm05-20)
-- position of the camera:   at the center of the robot direct on the *x-axis* with height of 6 cm from the floor
-- dimention of the image:   320 X 240 with 30 fps
+- Dimension of the arena:   240 cm x 360 cm
+- Dimension of the goal:    120 cm (rectangular shape)
+- Diameter of the ball:    20 cm 
+- Dimension of the robot:   all the information can be found at this [link](https://www.amazon.com/OSOYOO-Robotic-Mecanum-Platform-Raspberry/dp/B07WZJYVB5/?tag=tkm05-20)
+- Position of the camera:   at the center of the robot direct on the *x-axis* with height of 6 cm from the floor
+- Dimention of the image:   320 X 240 with 30 fps
 
- ### 1.2 Assumptions
+ ### Assumptions
  
- - the absolute position of the robot is assumed to be known in real time thanks to *motion capture system*  
- - each one of the goal is positioned in the center of the shorter side of the arena  
- - no other dynamic obstacle are present inside the arena except the ball
+ - The absolute position of the robot is known in real time( with help of *motion capture system*)   
+ - The goal position is known and does not change. 
+ - No other obstacle are present inside the arena apart from the ball.
  
- ### 1.3 Implementation
+ ### Implementation
  
- #### 1.3.1 Main hardware components
+ The implementation of this project has been done in three parts. First, buidling the robot. Second, implementing a robot simulation and the desired software architecture. Finally, integrating the hardware and software togther. 
  
+ #### Hardware Components
+ 
+ <p align="center">
+  <img src="project/Robot_Video_Pic.jpg">
+ </p>
+ 
+
  - **4 DC motors** of 9.0V and Gear Ratio of 1/75 
- - **4 mechanum wheels**
- - **arduino due**
+ - **4 Mechanum wheels**
+ - **Arduino due**
  - **2 H-bridge**
- - **battery pack** of 12 V
+ - **Battery pack** of 12 V
  - **Raspberry Pi 3** model A+
  - **RPi UPS POWERPACK** for raspberry
  - **Raspberry Pi Camera V2**
  
  
  
- ## 2. General structure
+ ## 2. Software Components
+ 
+ The software as been designent to implement a finite state machnine with six steps.
+ 
  
  ### 2.1 Main actions
  
- The code is implemented in order to allow the robot to execute these main actions:
+ The code can be logically divided into the following main is objectives:
  
- 1. searching of the ball
- 2. detection of the red ball 
- 3. centering of the camera with the respect to the extimated radius of the red ball
- 4. estimation of the distance of the ball with respect to the robot
- 5. planning and navigation of the robot based on a 2d costmap
- 6. push the ball toward the goal by keeping the contact between robot and ball
- 7. kick the ball 
+ 1. Search Objective: 
+ 2. Detect Objective:
+ 3. Camera Centring Objective: Centering of the camera with the respect to the extimated radius of the red ball
+ 4. Ball Position Objective: estimation of the distance of the ball with respect to the robot
+ 5. Navigatio Objective: planning and navigation of the robot based on a 2d costmap
+ 6. Push Ball Objective: push the ball toward the goal by keeping the contact between robot and ball
+ 7. Kick Ball Objective: 
  
  ### 2.1 Finite state machine
   
