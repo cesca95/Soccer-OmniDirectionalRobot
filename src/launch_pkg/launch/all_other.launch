@@ -20,7 +20,7 @@
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find launch_pkg)/rviz/viz_config.rviz" />
 
 
- <!--<node pkg="robot_control" type="central_control_node" name="central_control_node" /> -->
+ <node pkg="robot_control" type="central_control_node" name="central_control_node" />
  <node pkg="robot_vision" type="ball_detection.py" name="ball_detection" />
  <node pkg ="robot_control" type="BallPosePub.py" name="BallPosePub"/>
  <node pkg ="robot_vision" type="fake_laser.py" name="fake_laser"/>
