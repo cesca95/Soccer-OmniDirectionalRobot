@@ -44,7 +44,9 @@
  - **RPi UPS POWERPACK** for raspberry
  - **Raspberry Pi Camera V2**
  
- 
+    <p align="center">
+  <img src="RobotMotion_16MB.gif">
+ </p>
  
  ## 2. Software Components
  
