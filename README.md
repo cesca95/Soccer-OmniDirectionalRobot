@@ -1,9 +1,13 @@
 # SoccerForOmmiDriveRobot
 
-## 1. Aim of the project
+**Aim**: Build a ROS-based software architecture that allows a 4 wheel holonomic robot to detect a red ball and push it into a green goal. The robot must execute all the necessary operations inside an arena of a fixed area. 
 
-Build a ROS-based software architecture that allows a 4 wheel holonomic robot to detect a red ball and push it into a green goal. The robot must execute all the necessary operations inside an arena of a fixed area. 
-
+  <p align="center">
+  <img src="project/Sim2.gif">
+ </p>
+   <p align="center">
+  <img src="project/Sim3.gif">
+ </p>
 
 ### 1.1 Known information
 
@@ -50,10 +54,23 @@ Build a ROS-based software architecture that allows a 4 wheel holonomic robot to
  7. kick the ball 
  
  ### 2.1 Finite state machine
+  
+  <p align="center">
+  <img src="project/FSM1.jpg">
+ </p>
  
  
+  ### 2.2 Nodes diagram 
  
- ### 2.2 rqt_graph 
+ <p align="center">
+  <img src="project/Node_Diagram.jpg">
+ </p>
+ 
+ ### 2.3 rqt_graph 
+ 
+  <p align="center">
+  <img src="project/RQT.png">
+ </p>
  
  
  
