@@ -144,11 +144,13 @@
  
  #### 2.5 robot_control
  
- This package contains the nodes necessary for controlthe robot 
+ This package contains the nodes necessary for control the robot 
  
  #### 2.6 launch_pkg
  
- 
+ This package contains the launch files needed for running the project, in particular:
+ - *gazebo_robot.launch*
+ - *all_other.launch*
  
  
  ## 3 How to run the code
