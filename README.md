@@ -9,6 +9,8 @@
   <img src="project/Sim3.gif">
  </p>
 
+REMARK: Inside the simulation provided by Rviz, so the second gif, it is possible to notice that the position of the ball (represented by a semicircular red line) on the 2D costmap is "static" even if the robot is pushing it. This choice is based on the fact that the considered position is used only by move_base package and so, during the pushing phase, is useless to keep the position update inside the costmap. More details are given later in the readme.
+
 ###  Constraints 
 
 - Dimension of the arena:   240 cm x 360 cm
@@ -148,9 +150,17 @@
  
  #### 2.6 launch_pkg
  
- This package contains the launch files needed for running the project, in particular:
- - *gazebo_robot.launch*
- - *all_other.launch*
+ This package contains the launch files needed for running the simulation of the project, in particular :
+ - *gazebo_robot.launch*: runs the nodes needed for the environment of the simulation inside Gazebo such as the arena, with the red ball, and the robot 
+ - *all_other.launch*: runs all the other nodes needed for the project. The main one are:
+   - move_base: node with the aim of providing planning and navigation of the robot inside the simulated environment based on the 2D costmap  
+   - rviz: tool that allow to keep track of the movement of the robot and the dynamic obstacle (red ball) inside the 2D costmap
+   - central_control_node
+   - ball_detection.py
+   - BallPosePub.py
+   - fake_laser.py
+   - vel_converter_node
+   
  
  
  ## 3 How to run the code
