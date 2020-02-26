@@ -10,7 +10,7 @@
  </p>
 
 
-*REMARK: Inside the simulation provided by Rviz, so the second gif, it is possible to notice that the position of the ball (represented by a semicircular red line) on the 2D costmap is "static" even if the robot is pushing it. This choice is based on the fact that the considered position is used only by move_base package and so, during the pushing phase, is useless to keep the position update inside the costmap. More details are given later in the readme.*
+*REMARK: In the Rviz simulation, so the second gif, it is possible to notice that the position of the ball (represented by a semicircular red line) on the 2D costmap is "static" even if the robot is pushing it. This choice is based on the fact that the considered position is used only by move_base package and so, during the pushing phase, is useless to keep the position update inside the costmap. More details are given later in the readme.*
 
 ###  Constraints 
 
