@@ -1,4 +1,4 @@
-# SoccerForOmniDriveRobot
+# Soccer-OmniDirectionalRobot
 
 **Aim**: Build a ROS-based software architecture that allows a 4 wheel holonomic robot to detect a red ball and push it into a green goal. The robot must execute all the necessary operations inside an arena of a fixed area. 
 
