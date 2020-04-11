@@ -2,18 +2,17 @@
 
 **Aim**: Build a ROS-based software architecture that allows a 4 wheel holonomic robot to detect a red ball and push it into a green goal. The robot must execute all the necessary operations inside an arena of a fixed area. 
 
-Gazebo simulation:
+**Gazebo simulation:** This simulation shows the expected behaviour of the robot. 
   <p align="center">
   <img src="project/Sim2.gif">
  </p>
  
- Rviz simulation:
+ **Rviz simulation:** This simulation shows the robot and the [2D costmap](http://wiki.ros.org/costmap_2d) of the environment. In this particular map, the ball is represented by a semicircular red line.
    <p align="center">
   <img src="project/Sim3.gif">
  </p>
 
-
-*REMARK: In the Rviz simulation it is possible to notice that the position of the ball, represented by a semicircular red line, on the 2D costmap is "static" even if the robot is pushing it. This choice is based on the fact that the considered position is used only by move_base package and so, during the pushing phase, is useless to keep the position update inside the costmap. More details are given later in the readme.*
+*REMARK: For this project, we have decided to not refresh the position of the ball during the phase of pushing of the ball by the robot. More details will be given later in the readme.*  
 
 ###  Constraints 
 
