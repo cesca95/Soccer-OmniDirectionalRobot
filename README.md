@@ -21,7 +21,7 @@
 - Diameter of the ball:    20 cm 
 - Dimension of the robot:   all the information can be found at this [link](https://www.amazon.com/OSOYOO-Robotic-Mecanum-Platform-Raspberry/dp/B07WZJYVB5/?tag=tkm05-20)
 - Position of the camera:   at the center of the robot direct on the *x-axis* with a height of 6 cm from the floor
-- Dimention of the image:   320 X 240 with 30 fps
+- Dimension of the image:   320 X 240 with 30 fps
 
  ### Assumptions
  
@@ -39,15 +39,17 @@
   <img src="project/Robot_Video_Pic.jpg">
  </p>
  
-
+ - **Raspberry Pi 3** model A+
+ - **Raspberry Pi Camera V2**
+ - **RPI UPS POWERPACK** for Raspberry
+ - **Arduino due**
  - **4 DC motors** of 9.0V and Gear Ratio of 1/75 
  - **4 Mechanum wheels**
- - **Arduino due**
  - **2 H-bridge**
  - **Battery pack** of 12 V
- - **Raspberry Pi 3** model A+
- - **RPi UPS POWERPACK** for Raspberry
- - **Raspberry Pi Camera V2**
+ 
+ 
+ 
  
  <p align="center">
   <img src="project/RobotMotion_16MB.gif">
@@ -64,7 +66,7 @@
  
  1. Search Objective: Seach for the ball by rotating around the positive z-direction 
  2. Detect Objective: Detect the ball with help of OpenCV 
- 3. Camera Centring Objective: Control the robot to keep the camera on the center of the ball 
+ 3. Camera Centering Objective: Control the robot to keep the camera on the center of the ball 
  4. Ball Position Objective: Estimate the ball position using robot 2d pose and distance between the ball and the robot 
  5. Navigation Objective: Use move_base for navigation to the desired goal position 
  6. Push Ball Objective: Push the ball towards the goal 
