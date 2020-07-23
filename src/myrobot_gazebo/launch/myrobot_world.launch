@@ -24,7 +24,6 @@
   
     <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
           args="-urdf -model myrobot -param robot_description -x $(arg x1) -y $(arg y1) -z 0.05"/>
-     <!-- <node name="my_tf_broadcaster" pkg="myrobot_control" type="turtle_tf_broadcaster" /> --> 
    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
    <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />     
 
