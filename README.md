@@ -44,7 +44,7 @@
  - **RPI UPS POWERPACK** for Raspberry
  - **Arduino due**
  - **4 DC motors** of 9.0V and Gear Ratio of 1/75 
- - **4 Mechanum wheels**
+ - **4 mecanum wheels**
  - **2 H-bridge**
  - **Battery pack** of 12 V
  
